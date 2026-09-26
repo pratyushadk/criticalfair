@@ -1,0 +1,321 @@
+{
+ "drawing": {
+  "part_number": "",
+  "part_name": "",
+  "drawing_number": "",
+  "revision": "",
+  "material": "",
+  "material_spec": "",
+  "general_tolerance": ""
+ },
+ "characteristics": [
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T3"
+   ],
+   "box": [],
+   "name": "Bolt Hole Angular Spacing",
+   "notation": "4X 72°",
+   "type": "Basic",
+   "nominal": 72.0,
+   "upper": null,
+   "lower": null,
+   "unit": "deg",
+   "qty": 4,
+   "gdt": "",
+   "designator": "",
+   "tool": "CMM",
+   "confidence": 0.92,
+   "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T16"
+   ],
+   "box": [],
+   "name": "Bolt Hole Diameter",
+   "notation": "5X Ø8.9/8.7",
+   "type": "Diameter",
+   "nominal": 8.8,
+   "upper": 0.1,
+   "lower": -0.1,
+   "unit": "mm",
+   "qty": 5,
+   "gdt": "",
+   "designator": "",
+   "tool": "Bore Gauge",
+   "confidence": 0.9,
+   "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T17"
+   ],
+   "box": [],
+   "name": "Position of 5X Ø8.8 Holes to A,B",
+   "notation": "⌖ Ø0.35Ⓜ A B",
+   "type": "GD&T",
+   "nominal": 0.35,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "Position Ø0.35 Ⓜ | A | B",
+   "designator": "",
+   "tool": "CMM",
+   "confidence": 0.9,
+   "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T2"
+   ],
+   "box": [],
+   "name": "Flatness of Datum A Face",
+   "notation": "⏥ 0.08",
+   "type": "GD&T",
+   "nominal": 0.08,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "Flatness 0.08",
+   "designator": "",
+   "tool": "CMM",
+   "confidence": 0.88,
+   "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T4"
+   ],
+   "box": [],
+   "name": "Chamfer",
+   "notation": "2X 2 X 2",
+   "type": "Chamfer",
+   "nominal": 2.0,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 2,
+   "gdt": "",
+   "designator": "",
+   "tool": "Caliper",
+   "confidence": 0.8,
+   "issue": "Chamfer angle implied 45°, not stated"
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T5"
+   ],
+   "box": [],
+   "name": "Position of Ø38 Bore to A,B",
+   "notation": "⌖ Ø0.02 A B",
+   "type": "GD&T",
+   "nominal": 0.02,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "Position Ø0.02 | A | B",
+   "designator": "",
+   "tool": "CMM",
+   "confidence": 0.88,
+   "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T6",
+    "T7",
+    "T8"
+   ],
+   "box": [],
+   "name": "Bore Diameter",
+   "notation": "Ø 38.00/37.98",
+   "type": "Diameter",
+   "nominal": 37.99,
+   "upper": 0.01,
+   "lower": -0.01,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Bore Gauge",
+   "confidence": 0.92,
+   "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T9",
+    "T10",
+    "T11",
+    "T12"
+   ],
+   "box": [],
+   "name": "Outer Diameter (Datum B)",
+   "notation": "Ø 50.00/49.98",
+   "type": "Diameter",
+   "nominal": 49.99,
+   "upper": 0.01,
+   "lower": -0.01,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Micrometer",
+   "confidence": 0.92,
+   "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T13"
+   ],
+   "box": [],
+   "name": "Perpendicularity of Ø50 to A",
+   "notation": "⟂ Ø0Ⓜ A",
+   "type": "GD&T",
+   "nominal": 0.0,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "Perpendicularity Ø0 Ⓜ | A",
+   "designator": "",
+   "tool": "CMM",
+   "confidence": 0.85,
+   "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T14",
+    "T15"
+   ],
+   "box": [],
+   "name": "Profile of Surface (Right Step Faces) to A",
+   "notation": "⌓ 0.5 A",
+   "type": "GD&T",
+   "nominal": 0.5,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "Profile of a Surface 0.5 | A",
+   "designator": "",
+   "tool": "CMM",
+   "confidence": 0.85,
+   "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T18"
+   ],
+   "box": [],
+   "name": "Flange Thickness",
+   "notation": "7.4",
+   "type": "Basic",
+   "nominal": 7.4,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Caliper",
+   "confidence": 0.85,
+   "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T19"
+   ],
+   "box": [],
+   "name": "Profile of Surface (Flange Face) to A",
+   "notation": "⌓ 0.5 A",
+   "type": "GD&T",
+   "nominal": 0.5,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "Profile of a Surface 0.5 | A",
+   "designator": "",
+   "tool": "CMM",
+   "confidence": 0.85,
+   "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T20"
+   ],
+   "box": [],
+   "name": "Step Length",
+   "notation": "25.3",
+   "type": "Basic",
+   "nominal": 25.3,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Caliper",
+   "confidence": 0.85,
+   "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T21"
+   ],
+   "box": [],
+   "name": "Overall Length",
+   "notation": "79",
+   "type": "Basic",
+   "nominal": 79.0,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Caliper",
+   "confidence": 0.88,
+   "issue": ""
+  }
+ ],
+ "ignored_circles": [
+  "C1",
+  "C2"
+ ],
+ "warnings": [
+  "No title block present; part/drawing data unavailable",
+  "OCR of GD&T symbols verified visually; chamfer callout 2X 2 X 2 should be confirmed"
+ ]
+}

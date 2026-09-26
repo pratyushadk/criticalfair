@@ -1,0 +1,250 @@
+{
+ "drawing": {
+  "part_number": "CF-1001",
+  "part_name": "MOUNTING PLATE",
+  "drawing_number": "CF-1001-D",
+  "revision": "B",
+  "material": "AL 6061-T6",
+  "material_spec": "AMS 4027",
+  "general_tolerance": "X.X ±0.2  X.XX ±0.05  ANGLES ±0.5°"
+ },
+ "characteristics": [
+  {
+   "balloon": 1,
+   "circle": "C1",
+   "tokens": [
+    "T3"
+   ],
+   "box": [],
+   "name": "Overall Length",
+   "notation": "120 ±0.1",
+   "type": "Linear",
+   "nominal": 120.0,
+   "upper": 0.1,
+   "lower": -0.1,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Caliper",
+   "confidence": 0.96,
+   "issue": ""
+  },
+  {
+   "balloon": 6,
+   "circle": "C3",
+   "tokens": [
+    "T5"
+   ],
+   "box": [],
+   "name": "Hole Pattern Spacing (Basic)",
+   "notation": "96",
+   "type": "Basic",
+   "nominal": 96.0,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "CMM",
+   "confidence": 0.93,
+   "issue": ""
+  },
+  {
+   "balloon": 8,
+   "circle": "C2",
+   "tokens": [
+    "T4"
+   ],
+   "box": [],
+   "name": "Plate Thickness",
+   "notation": "10 ±0.1",
+   "type": "Linear",
+   "nominal": 10.0,
+   "upper": 0.1,
+   "lower": -0.1,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Micrometer",
+   "confidence": 0.94,
+   "issue": ""
+  },
+  {
+   "balloon": 7,
+   "circle": "C4",
+   "tokens": [
+    "T7"
+   ],
+   "box": [],
+   "name": "Corner Radius",
+   "notation": "R5 TYP",
+   "type": "Radius",
+   "nominal": 5.0,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 4,
+   "gdt": "",
+   "designator": "",
+   "tool": "Radius Gauge",
+   "confidence": 0.9,
+   "issue": ""
+  },
+  {
+   "balloon": 3,
+   "circle": "C5",
+   "tokens": [
+    "T8"
+   ],
+   "box": [],
+   "name": "Central Bore Diameter",
+   "notation": "Ø25 ±0.05",
+   "type": "Diameter",
+   "nominal": 25.0,
+   "upper": 0.05,
+   "lower": -0.05,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Bore Gauge",
+   "confidence": 0.95,
+   "issue": ""
+  },
+  {
+   "balloon": 2,
+   "circle": "C8",
+   "tokens": [
+    "T11"
+   ],
+   "box": [],
+   "name": "Overall Height",
+   "notation": "80 ±0.1",
+   "type": "Linear",
+   "nominal": 80.0,
+   "upper": 0.1,
+   "lower": -0.1,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Caliper",
+   "confidence": 0.95,
+   "issue": ""
+  },
+  {
+   "balloon": 9,
+   "circle": "C7",
+   "tokens": [
+    "T9"
+   ],
+   "box": [],
+   "name": "Flatness of Plate Face",
+   "notation": "⏥ 0.05",
+   "type": "GD&T",
+   "nominal": 0.05,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "Flatness 0.05",
+   "designator": "",
+   "tool": "CMM",
+   "confidence": 0.92,
+   "issue": ""
+  },
+  {
+   "balloon": 10,
+   "circle": "C9",
+   "tokens": [
+    "T12"
+   ],
+   "box": [],
+   "name": "Surface Roughness",
+   "notation": "Ra 1.6",
+   "type": "Surface Finish",
+   "nominal": 1.6,
+   "upper": null,
+   "lower": null,
+   "unit": "µm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Profilometer",
+   "confidence": 0.93,
+   "issue": ""
+  },
+  {
+   "balloon": 4,
+   "circle": "C10",
+   "tokens": [
+    "T13"
+   ],
+   "box": [],
+   "name": "Mounting Hole Diameter",
+   "notation": "4X Ø6.6 +0.1/-0",
+   "type": "Diameter",
+   "nominal": 6.6,
+   "upper": 0.1,
+   "lower": 0.0,
+   "unit": "mm",
+   "qty": 4,
+   "gdt": "",
+   "designator": "",
+   "tool": "Pin Gauge",
+   "confidence": 0.94,
+   "issue": ""
+  },
+  {
+   "balloon": 5,
+   "circle": "C11",
+   "tokens": [
+    "T14"
+   ],
+   "box": [],
+   "name": "Position of Mounting Holes",
+   "notation": "⌖ Ø0.2 Ⓜ A B C",
+   "type": "GD&T",
+   "nominal": 0.2,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 4,
+   "gdt": "Position Ø0.2 Ⓜ | A | B | C",
+   "designator": "",
+   "tool": "CMM",
+   "confidence": 0.93,
+   "issue": ""
+  },
+  {
+   "balloon": 11,
+   "circle": "C12",
+   "tokens": [
+    "T18"
+   ],
+   "box": [],
+   "name": "Break Sharp Edges",
+   "notation": "BREAK ALL SHARP EDGES 0.2 MAX.",
+   "type": "Note",
+   "nominal": null,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Visual",
+   "confidence": 0.9,
+   "issue": ""
+  }
+ ],
+ "ignored_circles": [
+  "C6"
+ ],
+ "warnings": [
+  "C6 is datum feature symbol B area / not a balloon"
+ ]
+}
