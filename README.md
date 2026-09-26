@@ -1,4 +1,4 @@
-# Critical Fair
+# Project Critical Fair
 
 Engineering drawing → ballooned drawing → AS9102 FAIR (Forms 1–3), with a human confirming every characteristic.
 
@@ -28,3 +28,8 @@ The four samples in `samples/drawings/` have saved analyses (`samples/cache/`) -
 - `.venv/bin/python scripts/render_test.py <drawing>` – full pipeline → overlays in `output/`.
 
 Implementation docs: `docs/ARCHITECTURE.md`, `docs/PRD.md`, `docs/SRD.md`. Team specs: `ARCHITECTURE.md`, `PRD.md`, `SRS_PART1.md`, `SRS_PART2.md`.
+
+## Team
+- **Manish**
+- **Pratyush**
+- **Nitish**

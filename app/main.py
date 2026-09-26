@@ -9,18 +9,21 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 load_dotenv(ROOT / ".env")
 
-from app import as9102, extractor, overlay, validation  # noqa: E402
+from app import as9102, extractor, hero, overlay, validation  # noqa: E402
 from app.drawing import load_drawing  # noqa: E402
 from app.perception import assemble, detect_circles, read_text  # noqa: E402
 
 SAMPLES = sorted((ROOT / "samples" / "drawings").glob("*.*"))
 STEPS = ["Upload", "Analyse", "Review", "Export"]
+SAMPLE_LABELS = {"flange.jpeg": "Flange · GD&T", "cylinder.png": "Hydraulic cylinder",
+                 "cylinder_ballooned.png": "Cylinder · pre-ballooned", "plate_synthetic.png": "Mounting plate"}
 ICON = {"Accepted": "✓", "Corrected": "✎", "Rejected": "✕"}
 PILL = {"Accepted": ("#DCFCE7", "#166534"), "Corrected": ("#DBEAFE", "#1E40AF"), "Rejected": ("#FEE2E2", "#991B1B"),
         "Needs review": ("#FEF3C7", "#92400E"), "Pending": ("#F3F4F6", "#374151")}
@@ -33,37 +36,33 @@ st.set_page_config(page_title="Critical Fair", page_icon="◎", layout="wide", i
 st.markdown("""<style>
 #MainMenu, footer, header[data-testid="stHeader"], [data-testid="stSidebarCollapsedControl"] {display:none;}
 html, body, [data-testid="stApp"] {font-family: -apple-system, "SF Pro Text", Inter, "Segoe UI", sans-serif;}
-[data-testid="stApp"] {background: #F2F4F8;}
+[data-testid="stApp"] {background: #F6F6F3;}
 .block-container {max-width: 1320px; padding-top: 1.1rem; padding-bottom: 2rem;}
 /* top bar */
-.st-key-topbar {background: linear-gradient(135deg, #0B1220 0%, #16213A 100%); border-radius: 16px;
-  padding: .85rem 1.3rem; margin-bottom: 1.1rem; box-shadow: 0 8px 24px rgba(11,18,32,.18);}
-.st-key-topbar [data-testid="stPopoverButton"] {background: rgba(255,255,255,.08); color:#E5E7EB; border:1px solid rgba(255,255,255,.18);}
+.st-key-topbar {background:#fff; border:1px solid #E4E4E0; border-radius:8px; padding:.6rem 1.1rem; margin-bottom:1rem;}
 .cf-brand {line-height:1.05;}
-.cf-brand .k {font-size:.68rem; letter-spacing:.32em; color:#7DD3FC; font-weight:700;}
-.cf-brand .n {font-size:1.45rem; font-weight:760; color:#fff; letter-spacing:-.01em;}
+.cf-brand {font-size:1.12rem; color:#1C1C1C;} .cf-brand .k {color:#8A8A84; font-weight:400;} .cf-brand .n {font-weight:650;}
 .cf-steps {display:flex; gap:.45rem; justify-content:center; align-items:center;}
-.cf-step {display:flex; align-items:center; gap:.45rem; color:#94A3B8; font-weight:600; font-size:.86rem;
-  padding:.32rem .75rem; border-radius:999px;}
-.cf-step b {width:1.35rem; height:1.35rem; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
-  background:rgba(255,255,255,.08); font-size:.72rem;}
-.cf-step.on {background:#2563EB; color:#fff;} .cf-step.on b {background:rgba(255,255,255,.25);}
-.cf-step.done {color:#E2E8F0;} .cf-step.done b {background:#16A34A; color:#fff;}
-.cf-sep {color:#334155;}
+.cf-step {display:flex; align-items:center; gap:.4rem; color:#9A9A94; font-weight:500; font-size:.88rem; padding:.3rem .2rem;
+  border-bottom:2px solid transparent;}
+.cf-step b {width:1.25rem; height:1.25rem; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+  border:1px solid #CFCFC9; font-size:.7rem; font-weight:500;}
+.cf-step.on {color:#1C1C1C; border-bottom-color:#1F4E79;} .cf-step.on b {background:#1F4E79; border-color:#1F4E79; color:#fff;}
+.cf-step.done {color:#55554F;} .cf-step.done b {border-color:#8FA9C1; color:#1F4E79;}
+.cf-sep {color:#D4D4CE; margin:0 .3rem;}
 /* cards */
-[class*="st-key-card"] {background:#fff; border-radius:16px; padding:1.2rem 1.3rem;
-  box-shadow: 0 1px 2px rgba(16,24,40,.05), 0 6px 20px rgba(16,24,40,.06); border:1px solid #E7EAF0;}
-.cf-title {font-size:1.08rem; font-weight:700; color:#0F172A; margin-bottom:.5rem;}
+[class*="st-key-card"] {background:#fff; border-radius:8px; padding:1.1rem 1.2rem; border:1px solid #E4E4E0;}
+.cf-title {font-size:1rem; font-weight:600; color:#1C1C1C; margin-bottom:.5rem;}
 .cf-hero {text-align:center; margin:.8rem 0 1.2rem;}
-.cf-hero h1 {font-size:2.15rem; font-weight:780; letter-spacing:-.025em; margin:0; padding:0; color:#0F172A;}
+.cf-hero h1 {font-size:1.7rem; font-weight:650; letter-spacing:-.015em; margin:0; padding:0; color:#1C1C1C;}
 .cf-hero p {color:#475569; font-size:1.02rem; margin:.45rem auto 0; max-width:720px;}
 .cf-flow {display:flex; justify-content:center; align-items:center; gap:.5rem; flex-wrap:wrap; margin:1rem 0 .2rem;}
 .cf-chip {background:#fff; border:1px solid #E2E8F0; border-radius:999px; padding:.3rem .8rem; font-size:.82rem; font-weight:600; color:#334155;}
 .cf-chip.ai {background:#EEF2FF; border-color:#C7D2FE; color:#3730A3;}
 .cf-arrow {color:#94A3B8;}
-.cf-name {font-size:1.4rem; font-weight:720; letter-spacing:-.01em; color:#0F172A; margin:.2rem 0 0;}
-.cf-notation {font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:1.12rem; background:#F1F5F9;
-  border:1px solid #E2E8F0; border-radius:10px; padding:.35rem .7rem; display:inline-block; margin:.4rem 0 .3rem;}
+.cf-name {font-size:1.3rem; font-weight:650; color:#1C1C1C; margin:.2rem 0 0;}
+.cf-notation {font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:1.08rem; background:#F6F6F3;
+  border:1px solid #E4E4E0; border-radius:4px; padding:.3rem .6rem; display:inline-block; margin:.4rem 0 .3rem;}
 .cf-meta {color:#64748B; font-size:.86rem;}
 .cf-pill {display:inline-block; padding:.12rem .6rem; border-radius:999px; font-size:.74rem; font-weight:700;}
 /* analysis */
@@ -71,27 +70,27 @@ html, body, [data-testid="stApp"] {font-family: -apple-system, "SF Pro Text", In
 .cf-stage:last-child {border-bottom:none;}
 .cf-dot {width:1.45rem; height:1.45rem; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
   font-size:.72rem; font-weight:700; flex-shrink:0;}
-.cf-dot.done {background:#DCFCE7; color:#166534;} .cf-dot.run {background:#2563EB; color:#fff; animation: cfp .9s infinite alternate;}
+.cf-dot.done {background:#DCFCE7; color:#166534;} .cf-dot.run {background:#1F4E79; color:#fff; animation: cfp .9s infinite alternate;}
 .cf-dot.wait {background:#F1F5F9; color:#94A3B8;}
 @keyframes cfp {from {opacity:1} to {opacity:.4}}
 .cf-stage .t {flex:1; font-weight:600; font-size:.92rem; color:#0F172A;} .cf-stage .d {color:#64748B; font-size:.8rem;}
 .cf-stage.wait .t {color:#94A3B8; font-weight:500;}
 .cf-feed {max-height: 340px; overflow:hidden;}
 .cf-item {display:flex; gap:.6rem; align-items:baseline; padding:.34rem 0; border-bottom:1px dashed #E2E8F0; animation: cfin .35s ease-out;}
-.cf-item .n {background:#16A34A; color:#fff; border-radius:6px; font-size:.7rem; font-weight:700; padding:.05rem .4rem; min-width:1.6rem; text-align:center;}
+.cf-item .n {background:#1F4E79; color:#fff; border-radius:6px; font-size:.7rem; font-weight:700; padding:.05rem .4rem; min-width:1.6rem; text-align:center;}
 .cf-item .nm {font-weight:600; font-size:.88rem; color:#0F172A;}
 .cf-item .nt {font-family:ui-monospace,Menlo,monospace; font-size:.8rem; color:#475569; margin-left:auto; white-space:nowrap;}
 @keyframes cfin {from {opacity:0; transform: translateY(-6px)} to {opacity:1; transform:none}}
 .cf-legend {display:flex; gap:1.1rem; color:#64748B; font-size:.8rem; margin-top:.5rem;}
 /* KPIs */
 .cf-kpis {display:grid; grid-template-columns: repeat(4, 1fr); gap:.9rem; margin:.2rem 0 1rem;}
-.cf-kpi {background:#fff; border:1px solid #E7EAF0; border-radius:14px; padding:.9rem 1.1rem; box-shadow:0 1px 2px rgba(16,24,40,.04);}
-.cf-kpi .v {font-size:1.75rem; font-weight:780; letter-spacing:-.02em; color:#0F172A;} .cf-kpi .l {color:#64748B; font-size:.8rem;}
-.cf-kpi.win {background:linear-gradient(135deg,#ECFDF5,#F0FDF4); border-color:#A7F3D0;} .cf-kpi.win .v {color:#047857;}
+.cf-kpi {background:#fff; border:1px solid #E4E4E0; border-radius:8px; padding:.8rem 1rem;}
+.cf-kpi .v {font-size:1.5rem; font-weight:600; color:#1C1C1C;} .cf-kpi .l {color:#6B6B66; font-size:.8rem;}
+.cf-kpi.win .v {color:#1F4E79;}
 .cf-mini {display:flex; gap:.5rem; flex-wrap:wrap;}
-.cf-mini span {background:#fff; border:1px solid #E2E8F0; border-radius:999px; padding:.22rem .7rem; font-size:.8rem; color:#475569;}
+.cf-mini span {background:#fff; border:1px solid #E4E4E0; border-radius:4px; padding:.2rem .6rem; font-size:.8rem; color:#55554F;}
 .cf-mini b {color:#0F172A;}
-.stButton button, .stDownloadButton button {border-radius:10px; font-weight:600;}
+.stButton button, .stDownloadButton button {border-radius:6px; font-weight:500;}
 </style>""", unsafe_allow_html=True)
 
 ss = st.session_state
@@ -184,7 +183,7 @@ def feed_html(items):
 # ---------------- top bar ----------------
 with st.container(key="topbar"):
     h1, h2, h3 = st.columns([1.3, 3, 0.9], vertical_alignment="center")
-    h1.markdown('<div class="cf-brand"><div class="k">PROJECT</div><div class="n">Critical Fair</div></div>',
+    h1.markdown('<div class="cf-brand"><span class="k">Project</span> <span class="n">Critical Fair</span></div>',
                 unsafe_allow_html=True)
     h2.markdown('<div class="cf-steps">' + '<span class="cf-sep">›</span>'.join(
         f'<div class="cf-step {"on" if i == ss.step else "done" if i < ss.step else ""}">'
@@ -199,29 +198,21 @@ with st.container(key="topbar"):
 
 # ================= 1. UPLOAD =================
 if ss.step == 0:
-    st.markdown("""<div class="cf-hero">
-      <h1>From engineering drawing to AS9102 report in minutes</h1>
-      <p>Ballooning and transcribing a drawing for First Article Inspection takes hours by hand — and one typo can reject the part.</p>
-      <div class="cf-flow"><span class="cf-chip">Drawing</span><span class="cf-arrow">→</span>
-      <span class="cf-chip ai">Read every dimension &amp; GD&amp;T</span><span class="cf-arrow">→</span>
-      <span class="cf-chip ai">Balloon the drawing</span><span class="cf-arrow">→</span>
-      <span class="cf-chip ai">Validate</span><span class="cf-arrow">→</span>
-      <span class="cf-chip">Engineer confirms</span><span class="cf-arrow">→</span>
-      <span class="cf-chip">AS9102 Excel</span></div></div>""", unsafe_allow_html=True)
-    _, mid, _ = st.columns([1, 2, 1])
+    components.html(hero.html(), height=404)
+    _, mid, _ = st.columns([0.6, 2, 0.6])
     with mid, st.container(key="card_upload"):
-        up = st.file_uploader("Engineering drawing · PDF, PNG or JPG · with or without balloons",
-                              type=["pdf", "png", "jpg", "jpeg"])
+        up = st.file_uploader("Drop an engineering drawing — PDF, PNG or JPG", type=["pdf", "png", "jpg", "jpeg"])
         if up is not None:
             ss.source = (up.name, up.getvalue())
         elif SAMPLES:
-            pick = st.pills("Or try a sample drawing", [s.name for s in SAMPLES], selection_mode="single")
+            pick = st.pills("or try a sample", [s.name for s in SAMPLES], selection_mode="single",
+                            format_func=lambda n: SAMPLE_LABELS.get(n, n))
             if pick:
                 ss.source = (pick, (ROOT / "samples" / "drawings" / pick).read_bytes())
         if "source" in ss:
             name, data = ss.source
             drawing = load_drawing(name, data)
-            st.image(drawing.image, caption=f"{name} · {drawing.image.width}×{drawing.image.height}px", width="stretch")
+            st.image(drawing.image, width="stretch")
             ready = extractor.has_api_key() or extractor.cached(drawing.sha256)
             if not ready:
                 st.error("Set ANTHROPIC_API_KEY in .env to analyse new drawings.")
@@ -231,7 +222,12 @@ if ss.step == 0:
                 go(1)
 
 
+    st.markdown('<div style="text-align:center;color:#9A9A94;font-size:.8rem;margin-top:1.4rem">'
+                'Project Critical Fair · built by Manish, Pratyush and Nitish</div>', unsafe_allow_html=True)
+
+
 # ================= 2. ANALYSE (live) =================
+
 elif ss.step == 1:
     # hide the previous screen's elements while this long-running step renders
     st.markdown('<style>[data-stale="true"], .stale-element {display:none !important;}</style>', unsafe_allow_html=True)
@@ -241,7 +237,7 @@ elif ss.step == 1:
     notes = {}
     left, right = st.columns([1.6, 1], gap="medium")
     with left, st.container(key="card_canvas"):
-        st.markdown(f'<div class="cf-title">Analysing {html.escape(drawing.filename)}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="cf-title">Analysing drawing</div>', unsafe_allow_html=True)
         canvas = st.empty()
         legend = st.empty()
     with right:
@@ -273,9 +269,9 @@ elif ss.step == 1:
     p = assemble(drawing.image, raw, src, [])
     notes[1] = f"{len(p.tokens)} text items located ({'vector PDF' if src == 'pdf' else 'OCR'})"
     paint(1, True)
-    legend.markdown('<div class="cf-legend"><span><span style="color:#0EA5E9">■</span> text located</span>'
-                    '<span><span style="color:#9333EA">○</span> existing balloon</span>'
-                    '<span><span style="color:#16A34A">■</span> characteristic identified</span></div>',
+    legend.markdown('<div class="cf-legend"><span><span style="color:#96968C">■</span> text located</span>'
+                    '<span><span style="color:#C0392B">○</span> existing balloon</span>'
+                    '<span><span style="color:#1F4E79">■</span> characteristic identified</span></div>',
                     unsafe_allow_html=True)
     show(2, 0.1)
     circles = detect_circles(drawing.image)
@@ -390,7 +386,7 @@ elif ss.step == 2:
             with st.expander(f"Drawing-level checks · {len(issues)}", expanded=any(i["kind"] != "ai" for i in issues)):
                 for n, i in enumerate(issues):
                     c1, c2 = st.columns([5, 1], vertical_alignment="center")
-                    c1.markdown(f"{'⚠️' if i['kind'] != 'ai' else 'ℹ️'} {i['text']}")
+                    c1.markdown(f"{'**Check** · ' if i['kind'] != 'ai' else 'Note · '}{i['text']}")
                     if i.get("token") and c2.button("Add", key=f"add_{n}"):
                         new = validation.row_from_token(p, i["token"], rows)
                         rows.append(new)
@@ -461,8 +457,8 @@ elif ss.step == 3:
     kpi3 = (f'<div class="cf-kpi"><div class="v">{skipped}</div><div class="l">accepted without individual review</div></div>'
             if skipped else f'<div class="cf-kpi"><div class="v">{cnt["Corrected"] + cnt["Rejected"]}</div>'
                             f'<div class="l">AI results corrected / rejected by engineer</div></div>')
-    st.markdown(f'<div class="cf-hero" style="margin-bottom:.4rem"><h1>AS9102 report ready</h1>'
-                f'<p>{html.escape(" · ".join(x for x in (ext.drawing.part_name or drawing.filename, ext.drawing.part_number) if x))}'
+    st.markdown(f'<div class="cf-hero" style="margin-bottom:.4rem"><h1>Report ready</h1>'
+                f'<p>{html.escape(" · ".join(x for x in (ext.drawing.part_name or "Engineering drawing", ext.drawing.part_number) if x))}'
                 f'</p></div>', unsafe_allow_html=True)
     st.markdown(f"""<div class="cf-kpis">
       <div class="cf-kpi"><div class="v">{len(out_rows)}</div><div class="l">characteristics in the report</div></div>
@@ -493,20 +489,21 @@ elif ss.step == 3:
         xlsx = as9102.build_workbook(rows, drawing, info, clean_png, template=tpl.getvalue() if tpl else None,
                                      model=extractor.MODEL)
         ss.xlsx = xlsx
-        stem = Path(drawing.filename).stem
-        st.download_button("Download AS9102 Excel", xlsx, f"{stem}_AS9102.xlsx",
+        names = as9102.file_names(info, drawing)
+        st.download_button("Download AS9102 Excel", xlsx, names["xlsx"],
                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                            type="primary", width="stretch", icon=":material/table_view:")
         st.download_button("Ballooned drawing · A3 PDF", overlay.a3_pdf(clean, " · ".join(
-                               x for x in (d.part_number, d.part_name, drawing.filename) if x)),
-                           f"{stem}_ballooned_A3.pdf", "application/pdf", width="stretch",
+                               x for x in (as9102.doc_id(info, drawing), d.part_name) if x)),
+                           names["pdf"], "application/pdf", width="stretch",
                            icon=":material/picture_as_pdf:")
-        trace = {"drawing": {"filename": drawing.filename, "sha256": drawing.sha256, "page": drawing.page + 1},
+        trace = {"document": as9102.doc_id(info, drawing),
+                 "drawing": {"sha256": drawing.sha256, "page": drawing.page + 1},
                  "model": extractor.MODEL, "analysed_at": ss.get("analysed_at"),
                  "exported_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                  "drawing_info": ext.drawing.model_dump(), "characteristics": rows}
         st.download_button("Traceability record (JSON)", json.dumps(trace, indent=2, default=str, ensure_ascii=False),
-                           f"{stem}_traceability.json", "application/json", type="tertiary", width="stretch")
+                           names["json"], "application/json", type="tertiary", width="stretch")
         st.caption("A3 landscape · team template · traceability sheet included")
         c1, c2 = st.columns(2)
         if c1.button("← Back to review", type="tertiary"):

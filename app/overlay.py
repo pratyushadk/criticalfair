@@ -179,11 +179,11 @@ def live_view(img: Image.Image, p, stage: int, items: list, width: int = 1100) -
     if stage >= 1:
         for t in p.tokens:
             if t.id not in used:
-                d.rectangle(S(t.box), outline=(14, 165, 233, 200), fill=(14, 165, 233, 35), width=1)
+                d.rectangle(S(t.box), outline=(150, 150, 140, 200), fill=(150, 150, 140, 30), width=1)
     if stage >= 2:
         for c in p.circles:
             b = S(c.box)
-            d.ellipse([b[0] - 3, b[1] - 3, b[2] + 3, b[3] + 3], outline=(147, 51, 234, 255), width=3)
+            d.ellipse([b[0] - 3, b[1] - 3, b[2] + 3, b[3] + 3], outline=(192, 57, 43, 255), width=2)
     if stage >= 3:
         f = _font(max(11, int(15 * scale / 0.6)) if scale < 1 else 15)
         for n, (toks, _, _) in enumerate(items, 1):
@@ -191,10 +191,10 @@ def live_view(img: Image.Image, p, stage: int, items: list, width: int = 1100) -
             if not boxes:
                 continue
             b = S((min(x[0] for x in boxes), min(x[1] for x in boxes), max(x[2] for x in boxes), max(x[3] for x in boxes)))
-            d.rectangle([b[0] - 3, b[1] - 3, b[2] + 3, b[3] + 3], outline=(22, 163, 74, 255), fill=(22, 163, 74, 60), width=2)
+            d.rectangle([b[0] - 3, b[1] - 3, b[2] + 3, b[3] + 3], outline=(31, 78, 121, 255), fill=(31, 78, 121, 40), width=2)
             tag = str(n)
             tb = d.textbbox((b[0] - 3, b[1] - 5), tag, font=f, anchor="lb")
-            d.rounded_rectangle([tb[0] - 4, tb[1] - 2, tb[2] + 4, tb[3] + 2], radius=5, fill=(22, 163, 74, 255))
+            d.rounded_rectangle([tb[0] - 4, tb[1] - 2, tb[2] + 4, tb[3] + 2], radius=3, fill=(31, 78, 121, 255))
             d.text((b[0] - 3, b[1] - 5), tag, font=f, fill=(255, 255, 255, 255), anchor="lb")
     return out
 

@@ -101,6 +101,19 @@ def limits(r: dict) -> tuple:
     return r.get("nominal"), up, abs(lo) if lo is not None else None, note
 
 
+def doc_id(info: dict, drawing) -> str:
+    """Professional document ID: part number (or drawing number) from the title block, else DWG-<hash>."""
+    raw = (info.get("part_number") or info.get("drawing_number") or "").strip()
+    clean = re.sub(r"[^A-Za-z0-9._-]+", "-", raw).strip("-._")
+    return clean or f"DWG-{drawing.sha256[:6].upper()}"
+
+
+def file_names(info: dict, drawing) -> dict:
+    base, day = doc_id(info, drawing), date.today().isoformat()
+    return {"xlsx": f"{base}_AS9102_FAIR_{day}.xlsx", "pdf": f"{base}_Ballooned_A3_{day}.pdf",
+            "json": f"{base}_Traceability_{day}.json", "png": f"{base}_Ballooned_{day}.png"}
+
+
 def _set(ws, ref, value):
     for rng in ws.merged_cells.ranges:
         if ref in rng:
@@ -148,7 +161,7 @@ def build_workbook(rows: list[dict], drawing, info: dict, balloon_png: bytes | N
     values.setdefault("inspection_date", date.today().strftime("%d-%b-%Y"))
     values.setdefault("fai_type", "Full")
     values["equipment"] = values.get("equipment") or ", ".join(tools)
-    values["drawing_file"] = values.get("drawing_file") or f"{Path(drawing.filename).stem}_ballooned.pdf"
+    values["drawing_file"] = values.get("drawing_file") or file_names(info, drawing)["pdf"]
     if info.get("material"):
         values["material"] = info["material"] + (f" / {info['material_spec']}" if info.get("material_spec")
                                                  and info["material_spec"] not in info["material"] else "")
@@ -228,7 +241,7 @@ def build_workbook(rows: list[dict], drawing, info: dict, balloon_png: bytes | N
     ts = wb.create_sheet("Traceability")
     thin = Side(style="thin", color="BFBFBF")
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    meta = [("Drawing file", drawing.filename), ("Drawing SHA-256", drawing.sha256), ("Sheet / page", drawing.page + 1),
+    meta = [("Document", doc_id(info, drawing)), ("Drawing SHA-256 (source fingerprint)", drawing.sha256), ("Sheet / page", drawing.page + 1),
             ("Image size (px)", f"{drawing.image.width} x {drawing.image.height}"), ("AI model", model),
             ("Exported (UTC)", now),
             ("Statement", "AI-assisted extraction. Every exported characteristic was accepted or corrected by a reviewer.")]
