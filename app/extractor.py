@@ -66,8 +66,25 @@ def expected_count(p: Perception) -> int:
     return max(digits, int(len(p.tokens) * 0.6), 5)
 
 
+ITEM_RE = re.compile(r'"tokens"\s*:\s*\[([^\]]*)\][^{}]*?"name"\s*:\s*"((?:[^"\\]|\\.)*)"\s*,\s*'
+                     r'"notation"\s*:\s*"((?:[^"\\]|\\.)*)"')
+
+
+def partial_items(text: str) -> list[tuple[list[str], str, str]]:
+    """Characteristics completed so far in a partially streamed JSON response: (token_ids, name, notation)."""
+    out = []
+    for m in ITEM_RE.finditer(text):
+        toks = re.findall(r"T\d+", m.group(1))
+        try:
+            name, notation = json.loads(f'"{m.group(2)}"'), json.loads(f'"{m.group(3)}"')
+        except ValueError:
+            name, notation = m.group(2), m.group(3)
+        out.append((toks, name, notation))
+    return out
+
+
 def extract(img, p: Perception, sha: str, on_progress=None) -> Extraction:
-    """on_progress(found_so_far, elapsed_s) is called while the response streams."""
+    """on_progress(streamed_text, elapsed_s) is called while the response streams."""
     hit = cached(sha)
     if hit:
         return hit
@@ -91,7 +108,7 @@ def extract(img, p: Perception, sha: str, on_progress=None) -> Extraction:
                 for delta in stream.text_stream:
                     text += delta
                     if on_progress:
-                        on_progress(len(re.findall(r'"notation"', text)), time.time() - start)
+                        on_progress(text, time.time() - start)
                 final = stream.get_final_message()
             break
         except anthropic.RateLimitError as e:

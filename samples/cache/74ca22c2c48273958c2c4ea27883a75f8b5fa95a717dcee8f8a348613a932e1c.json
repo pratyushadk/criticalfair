@@ -2,10 +2,10 @@
  "drawing": {
   "part_number": "CYL-8830-REV-B",
   "part_name": "HYDRAULIC CYLINDER ASSEMBLY",
-  "drawing_number": "CYL-8830",
+  "drawing_number": "CYL-8830-REV-B",
   "revision": "B",
   "material": "ALUM 6061-T6",
-  "material_spec": "",
+  "material_spec": "ALUM 6061-T6",
   "general_tolerance": "±0.1"
  },
  "characteristics": [
@@ -18,7 +18,7 @@
     "T6"
    ],
    "box": [],
-   "name": "Visual Inspection - Free of Burrs, Scratches, Tooling Marks",
+   "name": "Visual Inspection - free of burrs, scratches, tooling marks",
    "notation": "VISUAL INSPECTION: FREE OF BURRS, SCRATCHES, TOOLING MARKS",
    "type": "Note",
    "nominal": null,
@@ -29,7 +29,7 @@
    "gdt": "",
    "designator": "",
    "tool": "Visual",
-   "confidence": 0.92,
+   "confidence": 0.9,
    "issue": ""
   },
   {
@@ -50,7 +50,7 @@
    "gdt": "",
    "designator": "",
    "tool": "Caliper",
-   "confidence": 0.93,
+   "confidence": 0.9,
    "issue": ""
   },
   {
@@ -60,7 +60,7 @@
     "T10"
    ],
    "box": [],
-   "name": "Barrel End Width",
+   "name": "Groove Width",
    "notation": "W.30 ±0.15",
    "type": "Linear",
    "nominal": 30.0,
@@ -71,8 +71,8 @@
    "gdt": "",
    "designator": "",
    "tool": "Caliper",
-   "confidence": 0.6,
-   "issue": "Prefix 'W.' unclear; verify nominal 30"
+   "confidence": 0.7,
+   "issue": "Prefix 'W.' ambiguous; verify nominal 30"
   },
   {
    "balloon": 0,
@@ -113,7 +113,7 @@
    "gdt": "",
    "designator": "",
    "tool": "Thread Gauge",
-   "confidence": 0.88,
+   "confidence": 0.85,
    "issue": ""
   },
   {
@@ -124,7 +124,7 @@
     "T14"
    ],
    "box": [],
-   "name": "Cylindricity of Barrel Bore",
+   "name": "Cylindricity of Barrel Bore to A",
    "notation": "⌭ 0.31 A",
    "type": "GD&T",
    "nominal": 0.31,
@@ -135,8 +135,8 @@
    "gdt": "Cylindricity 0.31 | A",
    "designator": "",
    "tool": "CMM",
-   "confidence": 0.6,
-   "issue": "Symbol and datum cell unclear in frame"
+   "confidence": 0.7,
+   "issue": "Frame symbol and datum cell partially illegible"
   },
   {
    "balloon": 0,
@@ -147,18 +147,39 @@
    ],
    "box": [],
    "name": "Perpendicularity of Gland Face to A",
-   "notation": "⟂ 0.007 A",
+   "notation": "⟂ 0.00T A",
    "type": "GD&T",
-   "nominal": 0.007,
+   "nominal": null,
    "upper": null,
    "lower": null,
    "unit": "mm",
    "qty": 1,
-   "gdt": "Perpendicularity 0.007 | A",
+   "gdt": "Perpendicularity 0.00T | A",
    "designator": "",
    "tool": "CMM",
-   "confidence": 0.55,
-   "issue": "Value reads 0.00T; verify 0.007"
+   "confidence": 0.6,
+   "issue": "Tolerance value illegible (0.00T?)"
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T17"
+   ],
+   "box": [],
+   "name": "End View Thread",
+   "notation": "M10x1.5",
+   "type": "Thread",
+   "nominal": 10.0,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Thread Gauge",
+   "confidence": 0.85,
+   "issue": ""
   },
   {
    "balloon": 0,
@@ -189,8 +210,8 @@
     "T21"
    ],
    "box": [],
-   "name": "Concentricity of Gland Bore to A",
-   "notation": "◎ 0.60 A | E",
+   "name": "Concentricity of Rod Bore to E",
+   "notation": "◎ 0.60 A",
    "type": "GD&T",
    "nominal": 0.6,
    "upper": null,
@@ -211,18 +232,18 @@
    ],
    "box": [],
    "name": "Barrel Wall Thickness",
-   "notation": "2.5 ±.15",
+   "notation": "2.5.15",
    "type": "Linear",
-   "nominal": 2.5,
-   "upper": 0.15,
-   "lower": -0.15,
+   "nominal": null,
+   "upper": null,
+   "lower": null,
    "unit": "mm",
    "qty": 1,
    "gdt": "",
    "designator": "",
-   "tool": "Micrometer",
-   "confidence": 0.55,
-   "issue": "Text '2.5.15' ambiguous; verify tolerance"
+   "tool": "Caliper",
+   "confidence": 0.5,
+   "issue": "Value illegible; verify wall thickness dimension"
   },
   {
    "balloon": 0,
@@ -232,7 +253,7 @@
    ],
    "box": [],
    "name": "Barrel Outer Diameter",
-   "notation": "Ø65.00 ±0.05",
+   "notation": "Ø 65.00 ±0.05",
    "type": "Diameter",
    "nominal": 65.0,
    "upper": 0.05,
@@ -252,8 +273,8 @@
     "T26"
    ],
    "box": [],
-   "name": "Barrel Outer Diameter (second callout)",
-   "notation": "Ø65.00 ±0.05",
+   "name": "Barrel Outer Diameter (second)",
+   "notation": "Ø 65.00 ±0.05",
    "type": "Diameter",
    "nominal": 65.0,
    "upper": 0.05,
@@ -263,8 +284,8 @@
    "gdt": "",
    "designator": "",
    "tool": "Micrometer",
-   "confidence": 0.7,
-   "issue": "Possible duplicate of Ø65.00 dimension"
+   "confidence": 0.8,
+   "issue": "Possible duplicate dimension"
   },
   {
    "balloon": 0,
@@ -274,40 +295,103 @@
    ],
    "box": [],
    "name": "Barrel Bore Diameter",
-   "notation": "Ø50.00 +0.02/-0.00",
+   "notation": "Ø 50.00 +0.02/-0.00",
    "type": "Diameter",
-   "nominal": 50.0,
-   "upper": 0.02,
-   "lower": 0.0,
+   "nominal": 50.01,
+   "upper": 0.01,
+   "lower": -0.01,
    "unit": "mm",
    "qty": 1,
    "gdt": "",
    "designator": "",
    "tool": "Bore Gauge",
-   "confidence": 0.82,
+   "confidence": 0.75,
+   "issue": "Stacked tolerance OCR unclear; verify +0.02/-0.00"
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T29",
+    "T28"
+   ],
+   "box": [],
+   "name": "Barrel Bore Diameter (second)",
+   "notation": "Ø 50.00 +0.02/-0.00",
+   "type": "Diameter",
+   "nominal": 50.01,
+   "upper": 0.01,
+   "lower": -0.01,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Bore Gauge",
+   "confidence": 0.7,
+   "issue": "Possible duplicate; stacked tolerance unclear"
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T31"
+   ],
+   "box": [],
+   "name": "Rod End Thread",
+   "notation": "M10x1.5",
+   "type": "Thread",
+   "nominal": 10.0,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Thread Gauge",
+   "confidence": 0.8,
    "issue": ""
   },
   {
    "balloon": 0,
    "circle": "",
    "tokens": [
-    "T28",
-    "T29"
+    "T32"
    ],
    "box": [],
-   "name": "Barrel Bore Diameter (second callout)",
-   "notation": "Ø50.00 +0.02/-0.00",
-   "type": "Diameter",
-   "nominal": 50.0,
-   "upper": 0.02,
-   "lower": 0.0,
+   "name": "Gland Length",
+   "notation": "12.0 ±2.1",
+   "type": "Linear",
+   "nominal": 12.0,
+   "upper": 2.1,
+   "lower": -2.1,
    "unit": "mm",
    "qty": 1,
    "gdt": "",
    "designator": "",
-   "tool": "Bore Gauge",
-   "confidence": 0.65,
-   "issue": "Possible duplicate of Ø50.00 dimension"
+   "tool": "Caliper",
+   "confidence": 0.6,
+   "issue": "Value/tolerance OCR unclear"
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T33"
+   ],
+   "box": [],
+   "name": "Rod End Length",
+   "notation": "12.0 ±2.3",
+   "type": "Linear",
+   "nominal": 12.0,
+   "upper": 2.3,
+   "lower": -2.3,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Caliper",
+   "confidence": 0.6,
+   "issue": "Value/tolerance OCR unclear"
   },
   {
    "balloon": 0,
@@ -316,7 +400,7 @@
     "T34"
    ],
    "box": [],
-   "name": "Bore Surface Finish",
+   "name": "Barrel Bore Surface Finish",
    "notation": "Ra 0.8",
    "type": "Surface Finish",
    "nominal": 0.8,
@@ -329,69 +413,6 @@
    "tool": "Profilometer",
    "confidence": 0.9,
    "issue": ""
-  },
-  {
-   "balloon": 0,
-   "circle": "",
-   "tokens": [
-    "T31"
-   ],
-   "box": [],
-   "name": "Piston Rod End Thread",
-   "notation": "M10x1.5",
-   "type": "Thread",
-   "nominal": 10.0,
-   "upper": null,
-   "lower": null,
-   "unit": "mm",
-   "qty": 1,
-   "gdt": "",
-   "designator": "",
-   "tool": "Thread Gauge",
-   "confidence": 0.85,
-   "issue": ""
-  },
-  {
-   "balloon": 0,
-   "circle": "",
-   "tokens": [
-    "T32"
-   ],
-   "box": [],
-   "name": "Rod End Length",
-   "notation": "12.0 ±2.1",
-   "type": "Linear",
-   "nominal": 12.0,
-   "upper": 2.1,
-   "lower": -2.1,
-   "unit": "mm",
-   "qty": 1,
-   "gdt": "",
-   "designator": "",
-   "tool": "Caliper",
-   "confidence": 0.6,
-   "issue": "Value/tolerance text partially illegible"
-  },
-  {
-   "balloon": 0,
-   "circle": "",
-   "tokens": [
-    "T33"
-   ],
-   "box": [],
-   "name": "Gland Assembly Length",
-   "notation": "12.0 ±2.3",
-   "type": "Linear",
-   "nominal": 12.0,
-   "upper": 2.3,
-   "lower": -2.3,
-   "unit": "mm",
-   "qty": 1,
-   "gdt": "",
-   "designator": "",
-   "tool": "Caliper",
-   "confidence": 0.6,
-   "issue": "Value/tolerance text partially illegible"
   },
   {
    "balloon": 0,
@@ -413,29 +434,7 @@
    "designator": "",
    "tool": "CMM",
    "confidence": 0.65,
-   "issue": "Frame has extra cell; verify symbol"
-  },
-  {
-   "balloon": 0,
-   "circle": "",
-   "tokens": [
-    "T45",
-    "T46"
-   ],
-   "box": [],
-   "name": "Parallelism of Barrel End Face",
-   "notation": "∥ 0.20",
-   "type": "GD&T",
-   "nominal": 0.2,
-   "upper": null,
-   "lower": null,
-   "unit": "mm",
-   "qty": 1,
-   "gdt": "Parallelism 0.20",
-   "designator": "",
-   "tool": "CMM",
-   "confidence": 0.6,
-   "issue": "Datum cell unreadable"
+   "issue": "Frame contents partially illegible"
   },
   {
    "balloon": 0,
@@ -455,7 +454,7 @@
    "gdt": "",
    "designator": "",
    "tool": "Caliper",
-   "confidence": 0.88,
+   "confidence": 0.9,
    "issue": ""
   },
   {
@@ -476,8 +475,30 @@
    "gdt": "",
    "designator": "",
    "tool": "Profilometer",
-   "confidence": 0.88,
+   "confidence": 0.9,
    "issue": ""
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T45",
+    "T46"
+   ],
+   "box": [],
+   "name": "Parallelism of Barrel End Faces",
+   "notation": "∥ ◎ 0.20",
+   "type": "GD&T",
+   "nominal": 0.2,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "Parallelism 0.20",
+   "designator": "",
+   "tool": "CMM",
+   "confidence": 0.6,
+   "issue": "Frame symbols/datum illegible"
   },
   {
    "balloon": 0,
@@ -499,7 +520,7 @@
    "designator": "",
    "tool": "CMM",
    "confidence": 0.6,
-   "issue": "Middle datum cell illegible"
+   "issue": "Datum reference illegible"
   },
   {
    "balloon": 0,
@@ -527,10 +548,31 @@
    "balloon": 0,
    "circle": "",
    "tokens": [
-    "T17"
+    "T42"
    ],
    "box": [],
-   "name": "End View Thread (top)",
+   "name": "End View Bore Thread",
+   "notation": "Ø 40x1.5",
+   "type": "Thread",
+   "nominal": 40.0,
+   "upper": null,
+   "lower": null,
+   "unit": "mm",
+   "qty": 1,
+   "gdt": "",
+   "designator": "",
+   "tool": "Thread Gauge",
+   "confidence": 0.7,
+   "issue": "Callout format unclear"
+  },
+  {
+   "balloon": 0,
+   "circle": "",
+   "tokens": [
+    "T23"
+   ],
+   "box": [],
+   "name": "End View Side Thread",
    "notation": "M10x1.5",
    "type": "Thread",
    "nominal": 10.0,
@@ -542,48 +584,6 @@
    "designator": "",
    "tool": "Thread Gauge",
    "confidence": 0.8,
-   "issue": ""
-  },
-  {
-   "balloon": 0,
-   "circle": "",
-   "tokens": [
-    "T23"
-   ],
-   "box": [],
-   "name": "End View Thread (side)",
-   "notation": "M10x1.5",
-   "type": "Thread",
-   "nominal": 10.0,
-   "upper": null,
-   "lower": null,
-   "unit": "mm",
-   "qty": 1,
-   "gdt": "",
-   "designator": "",
-   "tool": "Thread Gauge",
-   "confidence": 0.78,
-   "issue": "Possible duplicate thread callout"
-  },
-  {
-   "balloon": 0,
-   "circle": "",
-   "tokens": [
-    "T42"
-   ],
-   "box": [],
-   "name": "Internal Thread Ø40x1.5",
-   "notation": "Ø40x1.5",
-   "type": "Thread",
-   "nominal": 40.0,
-   "upper": null,
-   "lower": null,
-   "unit": "mm",
-   "qty": 1,
-   "gdt": "",
-   "designator": "",
-   "tool": "Thread Gauge",
-   "confidence": 0.82,
    "issue": ""
   }
  ],
@@ -597,8 +597,7 @@
   "C7"
  ],
  "warnings": [
-  "Drawing contains no balloons; several GD&T frame contents and stacked tolerances are low-resolution/illegible",
-  "Duplicate general notes blocks present",
-  "Ø65.00 and Ø50.00 appear twice - possible duplicate callouts"
+  "Drawing has no balloons; several GD&T frames and stacked tolerances are illegible in the source",
+  "Duplicate-appearing Ø65.00 and Ø50.00 dimensions require verification"
  ]
 }

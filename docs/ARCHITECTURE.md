@@ -23,8 +23,10 @@ Upload (PDF / PNG / JPG)
   │
   ├─ 5. Review UI (app/main.py): flagged first, accept / edit / reject, add missed text as characteristic
   │
-  └─ 6. Export (app/as9102.py): team template Forms 1–3 (values only, formatting kept) +
-        Traceability sheet + Ballooned Drawing sheet · ballooned PDF/PNG · traceability JSON
+  └─ 6. Export (app/as9102.py): team "Final Template" (templates/AS9102_template.xlsx) - Part Info fields +
+        ballooned drawing in the placeholder, Characteristics rows (dropdown type, nominal/±tol for the PASS/FAIL
+        formula, equipment), Summary ranges extended if >30 rows; dropdown re-created (openpyxl drops the x14
+        version); missing dimension types appended to the reference list and marked. + Traceability sheet.
 ```
 
 Why this design: vision models are good at *reading* drawings but imprecise at *pixel coordinates*.
@@ -32,4 +34,4 @@ Local OCR/CV gives exact positions; Claude references their IDs. This fixed ball
 (errors of ~200 px before) and made one call enough (≈20–50 s vs 2+ min for two calls).
 
 Config (.env): `ANTHROPIC_API_KEY`, `CLAUDE_MODEL` (claude-opus-5), `CLAUDE_EFFORT` (medium), `CLAUDE_FAST_MODE` (1).
-Template cell map: `FORM1/FORM2/FORM3` in `app/as9102.py`.
+Template cell map: `PART_CELLS`, `FIRST_ROW`, `REF_FIRST/REF_LAST`, `IMAGE_AREA` in `app/as9102.py`.

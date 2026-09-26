@@ -23,14 +23,15 @@ for sample in ["flange.jpeg", "cylinder_ballooned.png"]:
     click("Accept all unflagged")
     while any(r["status"] == "Pending" for r in at.session_state["rows"]):
         click("Accept", exact=True)
-    click("Continue to export")
+    click("Generate AS9102")
     assert at.session_state["step"] == 3
     wb = load_workbook(io.BytesIO(at.session_state["xlsx"]))
-    f3 = wb.worksheets[2]
-    data = [r for r in f3.iter_rows(min_row=4, max_col=8, values_only=True) if r[0]]
-    print(sample, "->", wb.sheetnames, f"{len(data)} Form 3 rows")
-    for r in data[:4]:
-        print("   ", r)
-    print("    Form1:", wb.worksheets[0]["B3"].value, wb.worksheets[0]["D3"].value)
+    ch = wb["Characteristics"]
+    data = [r for r in ch.iter_rows(min_row=2, max_col=11, values_only=True) if r[0] is not None]
+    print(sample, "->", wb.sheetnames, f"{len(data)} characteristic rows")
+    for r in data[:3]:
+        print("   ", r[:7], r[9])
+    pi = wb["Part Info, Drawing & GDT Ref"]
+    print("    Part info:", pi["B4"].value, "|", pi["D4"].value, "| images:", len(pi._images))
     click("New drawing")
 print("OK")

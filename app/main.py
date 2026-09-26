@@ -7,6 +7,7 @@ import time
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -26,35 +27,71 @@ PILL = {"Accepted": ("#DCFCE7", "#166534"), "Corrected": ("#DBEAFE", "#1E40AF"),
 TOOLS = ["Caliper", "Micrometer", "Bore Gauge", "Height Gauge", "CMM", "Profilometer", "Thread Gauge (Go/No-Go)",
          "Pin Gauge", "Radius Gauge", "Protractor / CMM", "Dial Indicator", "Optical Comparator", "Visual"]
 DESIGNATORS = ["", "Key", "Critical", "Major", "Minor"]
+MANUAL_MIN_PER_CHAR, MANUAL_SETUP_MIN = 4, 20  # stated assumption for the time-saved estimate
 
 st.set_page_config(page_title="Critical Fair", page_icon="◎", layout="wide", initial_sidebar_state="collapsed")
 st.markdown("""<style>
-#MainMenu, footer, [data-testid="stSidebarCollapsedControl"] {display:none;}
-.block-container {max-width: 1240px; padding-top: 2rem;}
-.cf-brand {font-size:1.35rem; font-weight:700; letter-spacing:-.01em;}
-.cf-sub {color:#6B7280; font-size:.9rem; margin-top:-.2rem;}
-.cf-steps {display:flex; gap:2rem; justify-content:center; margin:1rem 0 1.4rem;}
-.cf-step {display:flex; align-items:center; gap:.5rem; color:#9CA3AF; font-weight:500; font-size:.95rem;}
-.cf-step b {width:1.7rem; height:1.7rem; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
-  background:#F3F4F6; font-size:.8rem;}
-.cf-step.on {color:#111827;} .cf-step.on b {background:#2563EB; color:#fff;}
-.cf-step.done {color:#111827;} .cf-step.done b {background:#DCFCE7; color:#166534;}
-.cf-h {font-size:1.45rem; font-weight:650; text-align:center; margin-bottom:.15rem;}
-.cf-c {text-align:center; color:#6B7280;}
-.cf-name {font-size:1.45rem; font-weight:650; letter-spacing:-.01em; margin:.15rem 0 0;}
-.cf-notation {font-family: ui-monospace, Menlo, monospace; font-size:1.15rem; background:#F3F4F6; border-radius:8px;
-  padding:.35rem .6rem; display:inline-block; margin:.35rem 0;}
-.cf-meta {color:#6B7280; font-size:.88rem;}
-.cf-pill {display:inline-block; padding:.12rem .6rem; border-radius:999px; font-size:.76rem; font-weight:600;}
-.cf-stage {display:flex; align-items:center; gap:.75rem; padding:.55rem .2rem; border-bottom:1px solid #F3F4F6;}
+#MainMenu, footer, header[data-testid="stHeader"], [data-testid="stSidebarCollapsedControl"] {display:none;}
+html, body, [data-testid="stApp"] {font-family: -apple-system, "SF Pro Text", Inter, "Segoe UI", sans-serif;}
+[data-testid="stApp"] {background: #F2F4F8;}
+.block-container {max-width: 1320px; padding-top: 1.1rem; padding-bottom: 2rem;}
+/* top bar */
+.st-key-topbar {background: linear-gradient(135deg, #0B1220 0%, #16213A 100%); border-radius: 16px;
+  padding: .85rem 1.3rem; margin-bottom: 1.1rem; box-shadow: 0 8px 24px rgba(11,18,32,.18);}
+.st-key-topbar [data-testid="stPopoverButton"] {background: rgba(255,255,255,.08); color:#E5E7EB; border:1px solid rgba(255,255,255,.18);}
+.cf-brand {line-height:1.05;}
+.cf-brand .k {font-size:.68rem; letter-spacing:.32em; color:#7DD3FC; font-weight:700;}
+.cf-brand .n {font-size:1.45rem; font-weight:760; color:#fff; letter-spacing:-.01em;}
+.cf-steps {display:flex; gap:.45rem; justify-content:center; align-items:center;}
+.cf-step {display:flex; align-items:center; gap:.45rem; color:#94A3B8; font-weight:600; font-size:.86rem;
+  padding:.32rem .75rem; border-radius:999px;}
+.cf-step b {width:1.35rem; height:1.35rem; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.08); font-size:.72rem;}
+.cf-step.on {background:#2563EB; color:#fff;} .cf-step.on b {background:rgba(255,255,255,.25);}
+.cf-step.done {color:#E2E8F0;} .cf-step.done b {background:#16A34A; color:#fff;}
+.cf-sep {color:#334155;}
+/* cards */
+[class*="st-key-card"] {background:#fff; border-radius:16px; padding:1.2rem 1.3rem;
+  box-shadow: 0 1px 2px rgba(16,24,40,.05), 0 6px 20px rgba(16,24,40,.06); border:1px solid #E7EAF0;}
+.cf-title {font-size:1.08rem; font-weight:700; color:#0F172A; margin-bottom:.5rem;}
+.cf-hero {text-align:center; margin:.8rem 0 1.2rem;}
+.cf-hero h1 {font-size:2.15rem; font-weight:780; letter-spacing:-.025em; margin:0; padding:0; color:#0F172A;}
+.cf-hero p {color:#475569; font-size:1.02rem; margin:.45rem auto 0; max-width:720px;}
+.cf-flow {display:flex; justify-content:center; align-items:center; gap:.5rem; flex-wrap:wrap; margin:1rem 0 .2rem;}
+.cf-chip {background:#fff; border:1px solid #E2E8F0; border-radius:999px; padding:.3rem .8rem; font-size:.82rem; font-weight:600; color:#334155;}
+.cf-chip.ai {background:#EEF2FF; border-color:#C7D2FE; color:#3730A3;}
+.cf-arrow {color:#94A3B8;}
+.cf-name {font-size:1.4rem; font-weight:720; letter-spacing:-.01em; color:#0F172A; margin:.2rem 0 0;}
+.cf-notation {font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:1.12rem; background:#F1F5F9;
+  border:1px solid #E2E8F0; border-radius:10px; padding:.35rem .7rem; display:inline-block; margin:.4rem 0 .3rem;}
+.cf-meta {color:#64748B; font-size:.86rem;}
+.cf-pill {display:inline-block; padding:.12rem .6rem; border-radius:999px; font-size:.74rem; font-weight:700;}
+/* analysis */
+.cf-stage {display:flex; align-items:center; gap:.7rem; padding:.5rem .1rem; border-bottom:1px solid #F1F5F9;}
 .cf-stage:last-child {border-bottom:none;}
-.cf-dot {width:1.5rem; height:1.5rem; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
-  font-size:.75rem; font-weight:700; flex-shrink:0;}
-.cf-dot.done {background:#DCFCE7; color:#166534;} .cf-dot.run {background:#2563EB; color:#fff; animation: cfp 1s infinite alternate;}
-.cf-dot.wait {background:#F3F4F6; color:#9CA3AF;}
-@keyframes cfp {from {opacity:1} to {opacity:.45}}
-.cf-stage .t {flex:1; font-weight:500;} .cf-stage .d {color:#6B7280; font-size:.85rem;}
-.cf-stage.wait .t {color:#9CA3AF;}
+.cf-dot {width:1.45rem; height:1.45rem; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+  font-size:.72rem; font-weight:700; flex-shrink:0;}
+.cf-dot.done {background:#DCFCE7; color:#166534;} .cf-dot.run {background:#2563EB; color:#fff; animation: cfp .9s infinite alternate;}
+.cf-dot.wait {background:#F1F5F9; color:#94A3B8;}
+@keyframes cfp {from {opacity:1} to {opacity:.4}}
+.cf-stage .t {flex:1; font-weight:600; font-size:.92rem; color:#0F172A;} .cf-stage .d {color:#64748B; font-size:.8rem;}
+.cf-stage.wait .t {color:#94A3B8; font-weight:500;}
+.cf-feed {max-height: 340px; overflow:hidden;}
+.cf-item {display:flex; gap:.6rem; align-items:baseline; padding:.34rem 0; border-bottom:1px dashed #E2E8F0; animation: cfin .35s ease-out;}
+.cf-item .n {background:#16A34A; color:#fff; border-radius:6px; font-size:.7rem; font-weight:700; padding:.05rem .4rem; min-width:1.6rem; text-align:center;}
+.cf-item .nm {font-weight:600; font-size:.88rem; color:#0F172A;}
+.cf-item .nt {font-family:ui-monospace,Menlo,monospace; font-size:.8rem; color:#475569; margin-left:auto; white-space:nowrap;}
+@keyframes cfin {from {opacity:0; transform: translateY(-6px)} to {opacity:1; transform:none}}
+.cf-legend {display:flex; gap:1.1rem; color:#64748B; font-size:.8rem; margin-top:.5rem;}
+/* KPIs */
+.cf-kpis {display:grid; grid-template-columns: repeat(4, 1fr); gap:.9rem; margin:.2rem 0 1rem;}
+.cf-kpi {background:#fff; border:1px solid #E7EAF0; border-radius:14px; padding:.9rem 1.1rem; box-shadow:0 1px 2px rgba(16,24,40,.04);}
+.cf-kpi .v {font-size:1.75rem; font-weight:780; letter-spacing:-.02em; color:#0F172A;} .cf-kpi .l {color:#64748B; font-size:.8rem;}
+.cf-kpi.win {background:linear-gradient(135deg,#ECFDF5,#F0FDF4); border-color:#A7F3D0;} .cf-kpi.win .v {color:#047857;}
+.cf-mini {display:flex; gap:.5rem; flex-wrap:wrap;}
+.cf-mini span {background:#fff; border:1px solid #E2E8F0; border-radius:999px; padding:.22rem .7rem; font-size:.8rem; color:#475569;}
+.cf-mini b {color:#0F172A;}
+.stButton button, .stDownloadButton button {border-radius:10px; font-weight:600;}
 </style>""", unsafe_allow_html=True)
 
 ss = st.session_state
@@ -69,7 +106,7 @@ def go(step: int):
 
 
 def restart():
-    for k in ("rows", "source", "drawing", "perception", "extraction", "issues"):
+    for k in ("rows", "source", "drawing", "perception", "extraction", "issues", "t_start", "t_analysis"):
         ss.pop(k, None)
     go(0)
 
@@ -118,6 +155,15 @@ def set_status(r, status):
     st.rerun()
 
 
+def fmt_dur(s: float) -> str:
+    s = int(s)
+    return f"{s // 60}m {s % 60:02d}s" if s >= 60 else f"{s}s"
+
+
+def manual_minutes(n: int) -> int:
+    return MANUAL_SETUP_MIN + MANUAL_MIN_PER_CHAR * n
+
+
 def stage_html(stages, cur, notes):
     out = []
     for i, name in enumerate(stages):
@@ -128,33 +174,48 @@ def stage_html(stages, cur, notes):
     return "".join(out)
 
 
-# ---------------- header ----------------
-h1, h2 = st.columns([6, 1], vertical_alignment="center")
-h1.markdown('<div class="cf-brand">◎ Critical Fair</div>'
-            '<div class="cf-sub">Engineering drawing → ballooned drawing → AS9102 report</div>', unsafe_allow_html=True)
-with h2.popover("Settings", icon=":material/tune:"):
-    st.caption(f"Model · `{extractor.MODEL}` · effort `{extractor.EFFORT}`" if extractor.has_api_key()
-               else "No API key · only previously analysed drawings work")
-    validation.CONFIDENCE_THRESHOLD = st.slider("Flag below confidence", 0.5, 1.0, 0.8, 0.05)
-    ss.force = st.toggle("Re-analyse (ignore saved result)", value=ss.get("force", False))
+def feed_html(items):
+    rows = [f'<div class="cf-item"><span class="n">{n}</span><span class="nm">{html.escape(nm)}</span>'
+            f'<span class="nt">{html.escape(nt[:34])}</span></div>'
+            for n, (_, nm, nt) in reversed(list(enumerate(items, 1)))][:9]
+    return f'<div class="cf-feed">{"".join(rows)}</div>'
 
-st.markdown('<div class="cf-steps">' + "".join(
-    f'<div class="cf-step {"on" if i == ss.step else "done" if i < ss.step else ""}">'
-    f'<b>{"✓" if i < ss.step else i + 1}</b>{s}</div>' for i, s in enumerate(STEPS)) + '</div>', unsafe_allow_html=True)
+
+# ---------------- top bar ----------------
+with st.container(key="topbar"):
+    h1, h2, h3 = st.columns([1.3, 3, 0.9], vertical_alignment="center")
+    h1.markdown('<div class="cf-brand"><div class="k">PROJECT</div><div class="n">Critical Fair</div></div>',
+                unsafe_allow_html=True)
+    h2.markdown('<div class="cf-steps">' + '<span class="cf-sep">›</span>'.join(
+        f'<div class="cf-step {"on" if i == ss.step else "done" if i < ss.step else ""}">'
+        f'<b>{"✓" if i < ss.step else i + 1}</b>{s}</div>' for i, s in enumerate(STEPS)) + '</div>',
+        unsafe_allow_html=True)
+    with h3.popover("Settings", icon=":material/tune:", width="stretch"):
+        st.caption(f"Model · `{extractor.MODEL}` · effort `{extractor.EFFORT}`" if extractor.has_api_key()
+                   else "No API key · only previously analysed drawings work")
+        validation.CONFIDENCE_THRESHOLD = st.slider("Flag below confidence", 0.5, 1.0, 0.8, 0.05)
+        ss.force = st.toggle("Re-analyse (ignore saved result)", value=ss.get("force", False))
 
 
 # ================= 1. UPLOAD =================
 if ss.step == 0:
+    st.markdown("""<div class="cf-hero">
+      <h1>From engineering drawing to AS9102 report in minutes</h1>
+      <p>Ballooning and transcribing a drawing for First Article Inspection takes hours by hand — and one typo can reject the part.</p>
+      <div class="cf-flow"><span class="cf-chip">Drawing</span><span class="cf-arrow">→</span>
+      <span class="cf-chip ai">Read every dimension &amp; GD&amp;T</span><span class="cf-arrow">→</span>
+      <span class="cf-chip ai">Balloon the drawing</span><span class="cf-arrow">→</span>
+      <span class="cf-chip ai">Validate</span><span class="cf-arrow">→</span>
+      <span class="cf-chip">Engineer confirms</span><span class="cf-arrow">→</span>
+      <span class="cf-chip">AS9102 Excel</span></div></div>""", unsafe_allow_html=True)
     _, mid, _ = st.columns([1, 2, 1])
-    with mid, st.container(border=True):
-        st.markdown('<div class="cf-h">Upload an engineering drawing</div>'
-                    '<div class="cf-c">PDF, PNG or JPG · with or without balloons. The original is never modified.</div>',
-                    unsafe_allow_html=True)
-        up = st.file_uploader("Drawing", type=["pdf", "png", "jpg", "jpeg"], label_visibility="collapsed")
+    with mid, st.container(key="card_upload"):
+        up = st.file_uploader("Engineering drawing · PDF, PNG or JPG · with or without balloons",
+                              type=["pdf", "png", "jpg", "jpeg"])
         if up is not None:
             ss.source = (up.name, up.getvalue())
         elif SAMPLES:
-            pick = st.pills("Or try a sample", [s.name for s in SAMPLES], selection_mode="single")
+            pick = st.pills("Or try a sample drawing", [s.name for s in SAMPLES], selection_mode="single")
             if pick:
                 ss.source = (pick, (ROOT / "samples" / "drawings" / pick).read_bytes())
         if "source" in ss:
@@ -166,82 +227,112 @@ if ss.step == 0:
                 st.error("Set ANTHROPIC_API_KEY in .env to analyse new drawings.")
             elif st.button("Analyse drawing  →", type="primary", width="stretch"):
                 ss.drawing = drawing
+                ss.t_start = time.time()
                 go(1)
-            st.caption("Next: Critical Fair finds every characteristic, balloons it, and asks you to confirm anything uncertain.")
 
 
-# ================= 2. ANALYSE (staged progress) =================
+# ================= 2. ANALYSE (live) =================
 elif ss.step == 1:
+    # hide the previous screen's elements while this long-running step renders
+    st.markdown('<style>[data-stale="true"], .stale-element {display:none !important;}</style>', unsafe_allow_html=True)
     drawing = ss.drawing
-    stages = ["Uploading drawing", "Analysing drawing", "Detecting balloons", "Reading characteristics",
-              "Validating", "Generating ballooned drawing & Excel"]
+    stages = ["Uploading drawing", "Reading text & symbols", "Detecting balloons", "Interpreting characteristics",
+              "Validating", "Placing balloons & preparing AS9102"]
     notes = {}
-    _, mid, _ = st.columns([1, 2, 1])
-    with mid, st.container(border=True):
-        st.markdown(f'<div class="cf-h">Analysing {html.escape(drawing.filename)}</div>'
-                    '<div class="cf-c">This usually takes 20–60 seconds. You will review everything before export.</div>',
+    left, right = st.columns([1.6, 1], gap="medium")
+    with left, st.container(key="card_canvas"):
+        st.markdown(f'<div class="cf-title">Analysing {html.escape(drawing.filename)}</div>', unsafe_allow_html=True)
+        canvas = st.empty()
+        legend = st.empty()
+    with right:
+        with st.container(key="card_stages"):
+            bar = st.progress(0.0)
+            box = st.empty()
+            eta_line = st.empty()
+        with st.container(key="card_feed"):
+            st.markdown('<div class="cf-title">Characteristics found</div>', unsafe_allow_html=True)
+            feed = st.empty()
+    t0 = time.time()
+    state = {"items": [], "last_draw": 0.0}
+
+    def show(cur, frac, eta=None):
+        box.markdown(stage_html(stages, cur, notes), unsafe_allow_html=True)
+        bar.progress(min(1.0, frac))
+        eta_line.caption(f"Elapsed {time.time() - t0:.0f}s" + (f" · about {max(1, eta):.0f}s remaining" if eta else ""))
+
+    def paint(stage, force=False):
+        if force or time.time() - state["last_draw"] > 0.8:
+            canvas.image(overlay.live_view(drawing.image, p, stage, state["items"]), width="stretch")
+            feed.markdown(feed_html(state["items"]), unsafe_allow_html=True)
+            state["last_draw"] = time.time()
+
+    canvas.image(drawing.image, width="stretch")
+    notes[0] = f"{len(ss.source[1]) / 1024:.0f} KB"
+    show(1, 0.04)
+    raw, src = read_text(drawing.image, drawing.pdf_text)
+    p = assemble(drawing.image, raw, src, [])
+    notes[1] = f"{len(p.tokens)} text items located ({'vector PDF' if src == 'pdf' else 'OCR'})"
+    paint(1, True)
+    legend.markdown('<div class="cf-legend"><span><span style="color:#0EA5E9">■</span> text located</span>'
+                    '<span><span style="color:#9333EA">○</span> existing balloon</span>'
+                    '<span><span style="color:#16A34A">■</span> characteristic identified</span></div>',
                     unsafe_allow_html=True)
-        st.write("")
-        bar = st.progress(0.0)
-        box = st.empty()
-        eta_line = st.empty()
-        t0 = time.time()
+    show(2, 0.1)
+    circles = detect_circles(drawing.image)
+    p = assemble(drawing.image, raw, src, circles)
+    notes[2] = f"{sum(1 for c in circles if c.digits) or len(circles)} existing balloons" if p.has_balloons \
+        else "None on drawing — will generate"
+    paint(2, True)
+    est, exp_n = extractor.estimate_seconds(p), extractor.expected_count(p)
+    show(3, 0.15, est)
+    cached_hit = None if ss.get("force") else extractor.cached(drawing.sha256)
+    try:
+        if cached_hit:  # replay the saved analysis so the process stays visible
+            ext = cached_hit
+            for c in ext.characteristics:
+                state["items"].append((c.tokens, c.name, c.notation))
+                notes[3] = f"{len(state['items'])} found · saved analysis"
+                show(3, 0.15 + 0.7 * len(state["items"]) / max(1, len(ext.characteristics)))
+                paint(3, True)
+                time.sleep(min(0.18, 4.0 / max(1, len(ext.characteristics))))
+        else:
+            if ss.get("force"):
+                for d in extractor.CACHE_DIRS:
+                    (d / f"{drawing.sha256}.json").unlink(missing_ok=True)
 
-        def show(cur, frac, eta=None):
-            box.markdown(stage_html(stages, cur, notes), unsafe_allow_html=True)
-            bar.progress(min(1.0, frac))
-            elapsed = time.time() - t0
-            eta_line.caption(f"Elapsed {elapsed:.0f}s" + (f" · about {max(1, eta):.0f}s remaining" if eta else ""))
-
-        notes[0] = f"{len(ss.source[1]) / 1024:.0f} KB"
-        show(1, 0.05)
-        raw, src = read_text(drawing.image, drawing.pdf_text)
-        notes[1] = f"{len(raw)} text items ({'vector PDF text' if src == 'pdf' else 'OCR'})"
-        show(2, 0.12)
-        circles = detect_circles(drawing.image)
-        p = assemble(drawing.image, raw, src, circles)
-        n_b = sum(1 for c in circles if c.digits)
-        notes[2] = f"{len(circles)} balloon candidates" if p.has_balloons else "No balloons - they will be generated"
-        est = extractor.estimate_seconds(p)
-        exp_n = extractor.expected_count(p)
-        cached_hit = None if ss.get("force") else extractor.cached(drawing.sha256)
-        show(3, 0.18, est)
-        try:
-            if cached_hit:
-                ext = cached_hit
-                notes[3] = f"{len(ext.characteristics)} found · loaded saved analysis"
-            else:
-                def progress(found, elapsed):
-                    notes[3] = f"{found} found so far"
-                    frac = 0.18 + 0.7 * min(0.97, max(elapsed / est, found / max(exp_n, 1)))
-                    show(3, frac, max(3, est - elapsed))
-                sha = drawing.sha256 if not ss.get("force") else drawing.sha256
-                if ss.get("force"):
-                    for d in extractor.CACHE_DIRS:
-                        (d / f"{sha}.json").unlink(missing_ok=True)
-                ext = extractor.extract(drawing.image, p, sha, on_progress=progress)
-                notes[3] = f"{len(ext.characteristics)} characteristics in {time.time() - t0:.0f}s"
-        except extractor.ExtractionError as e:
-            st.error(str(e))
-            if st.button("← Back"):
-                go(0)
-            st.stop()
-        show(4, 0.9)
-        rows, issues = validation.build(ext, p)
-        overlay.place_balloons(drawing.image, rows)
-        flagged = sum(r["flagged"] for r in rows)
-        notes[4] = f"{flagged} to review · {len(issues)} drawing checks"
-        show(5, 0.95)
-        info = ext.drawing
-        ss.draft_xlsx = as9102.build_workbook(rows, drawing, info.model_dump(), None, model=extractor.MODEL)
-        notes[5] = "Ready"
-        show(6, 1.0)
-        ss.perception, ss.extraction, ss.rows, ss.issues = p, ext, rows, issues
-        ss.analysed_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
-        ss.idx = order(rows)[0] if rows else 0
-        ss.nav += 1
-        time.sleep(0.6)
-        go(2)
+            def progress(text, elapsed):
+                items = extractor.partial_items(text)
+                state["items"] = items
+                notes[3] = f"{len(items)} found so far"
+                frac = 0.15 + 0.7 * min(0.97, max(elapsed / est, len(items) / max(exp_n, 1)))
+                show(3, frac, max(2, est - elapsed))
+                paint(3)
+            ext = extractor.extract(drawing.image, p, drawing.sha256, on_progress=progress)
+            state["items"] = [(c.tokens, c.name, c.notation) for c in ext.characteristics]
+        notes[3] = f"{len(ext.characteristics)} characteristics"
+        paint(3, True)
+    except extractor.ExtractionError as e:
+        st.error(str(e))
+        if st.button("← Back"):
+            go(0)
+        st.stop()
+    show(4, 0.9)
+    rows, issues = validation.build(ext, p)
+    flagged = sum(r["flagged"] for r in rows)
+    notes[4] = f"{len(p.tokens) + len(circles) + len(rows) * 6} checks · {flagged} to review"
+    show(5, 0.95)
+    overlay.place_balloons(drawing.image, rows, p)
+    generated = sum(1 for r in rows if r["generated"])
+    notes[5] = f"{generated} balloons placed" if generated else "Balloons linked"
+    canvas.image(overlay.draw(drawing.image, rows), width="stretch")
+    show(6, 1.0)
+    ss.perception, ss.extraction, ss.rows, ss.issues = p, ext, rows, issues
+    ss.t_analysis = time.time() - t0
+    ss.analysed_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    ss.idx = order(rows)[0] if rows else 0
+    ss.nav += 1
+    time.sleep(1.2)
+    go(2)
 
 
 # ================= 3. REVIEW =================
@@ -255,11 +346,16 @@ elif ss.step == 2:
     r = rows[ss.idx]
     done = sum(x["status"] != "Pending" for x in rows)
     flagged_left = sum(1 for x in rows if x["status"] == "Pending" and x["flagged"])
+    generated = sum(1 for x in rows if x["generated"])
 
-    t1, t2 = st.columns([4, 1], vertical_alignment="center")
-    t1.progress(done / len(rows), text=f"{done} of {len(rows)} confirmed · {flagged_left} need your attention")
-    if t2.button("Accept all unflagged", type="tertiary", width="stretch",
-                 help="Accept every pending characteristic that has no warnings"):
+    t1, t2, t3 = st.columns([3.2, 1, 1], vertical_alignment="center")
+    with t1:
+        st.markdown(f'<div class="cf-mini"><span><b>{len(rows)}</b> characteristics</span>'
+                    f'<span><b>{generated}</b> balloons generated</span>'
+                    f'<span><b>{flagged_left}</b> need a decision</span>'
+                    f'<span>analysed in <b>{fmt_dur(ss.get("t_analysis", 0))}</b></span></div>', unsafe_allow_html=True)
+        st.progress(done / len(rows), text=f"{done} of {len(rows)} confirmed")
+    if t2.button("Accept all unflagged", width="stretch", help="Accept every pending item that passed all checks"):
         for x in rows:
             if x["status"] == "Pending" and not x["flagged"]:
                 x["status"] = "Accepted"
@@ -267,11 +363,20 @@ elif ss.step == 2:
             advance()
         ss.nav += 1
         st.rerun()
+    with t3.popover("Skip review", icon=":material/fast_forward:", width="stretch"):
+        st.markdown(f"Accept the AI's reading for all **{len(rows) - done}** remaining characteristics"
+                    f"{f' (incl. {flagged_left} flagged)' if flagged_left else ''} and go straight to export.")
+        st.caption("They are marked 'accepted without individual review' in the report.")
+        if st.button("Accept all & export", type="primary", width="stretch"):
+            for x in rows:
+                if x["status"] == "Pending":
+                    x["status"], x["_skipped"] = "Accepted", True
+            go(3)
 
-    left, right = st.columns([1.55, 1], gap="large")
+    left, right = st.columns([1.55, 1], gap="medium")
     view = overlay.draw(drawing.image, rows, selected=r["id"])
     with left:
-        with st.container(border=True):
+        with st.container(key="card_drawing"):
             st.image(view, width="stretch")
         seq = order(rows)
         marks = {rows[i]["id"]: ICON.get(rows[i]["status"], "!" if rows[i]["flagged"] else "") for i in seq}
@@ -282,32 +387,35 @@ elif ss.step == 2:
             st.rerun()
         issues = ss.issues
         if issues:
-            with st.expander(f"Drawing checks · {len(issues)}", expanded=any(i["kind"] != "ai" for i in issues)):
+            with st.expander(f"Drawing-level checks · {len(issues)}", expanded=any(i["kind"] != "ai" for i in issues)):
                 for n, i in enumerate(issues):
                     c1, c2 = st.columns([5, 1], vertical_alignment="center")
                     c1.markdown(f"{'⚠️' if i['kind'] != 'ai' else 'ℹ️'} {i['text']}")
                     if i.get("token") and c2.button("Add", key=f"add_{n}"):
                         new = validation.row_from_token(p, i["token"], rows)
                         rows.append(new)
-                        overlay.place_balloons(drawing.image, rows)
+                        overlay.place_balloons(drawing.image, rows, p)
                         ss.issues = [x for x in issues if x is not i]
                         ss.idx = len(rows) - 1
                         ss.nav += 1
                         st.rerun()
 
-    with right, st.container(border=True):
+    with right, st.container(key="card_item"):
         bal = f"balloon {r['balloon']} on drawing" if not r["generated"] else "balloon generated"
         st.markdown(f'<span class="cf-meta">#{r["id"]} · {bal} · zone {r["zone"] or "?"}</span> &nbsp;{pill(r)}',
                     unsafe_allow_html=True)
         st.markdown(f'<div class="cf-name">{html.escape(r["name"])}</div>'
                     f'<div class="cf-notation">{html.escape(r["notation"])}</div>'
-                    f'<div class="cf-meta">{html.escape(r["type"])} · {r["tool"]} · {r["confidence"]:.0%} confidence'
-                    f'{" · qty " + str(r["qty"]) if (r["qty"] or 1) > 1 else ""}</div>', unsafe_allow_html=True)
+                    f'<div class="cf-meta">{html.escape(as9102.dimension_type(r))} · {r["tool"]} · '
+                    f'{r["confidence"]:.0%} confidence{" · qty " + str(r["qty"]) if (r["qty"] or 1) > 1 else ""}</div>',
+                    unsafe_allow_html=True)
         st.image(overlay.crop(view, r), width="stretch")
         if r["flags"]:
             st.warning("\n".join(f"- {f}" for f in dict.fromkeys(r["flags"])))
+        else:
+            st.success("Passed all automated checks")
         b1, b2, b3 = st.columns(3)
-        if b1.button("Reject", width="stretch", help="Not a characteristic / wrong - exclude from AS9102"):
+        if b1.button("Reject", width="stretch", help="Not a characteristic / wrong — exclude from the report"):
             set_status(r, "Rejected")
         with b2.popover("Edit", width="stretch"):
             with st.form(f"edit_{r['key']}", border=False):
@@ -337,7 +445,7 @@ elif ss.step == 2:
     if n1.button("← Start over", type="tertiary"):
         restart()
     left_to_do = len(rows) - done
-    if n2.button("Continue to export →" if not left_to_do else f"{left_to_do} left to confirm", type="primary",
+    if n2.button("Generate AS9102 →" if not left_to_do else f"{left_to_do} left to confirm", type="primary",
                  disabled=bool(left_to_do), width="stretch"):
         go(3)
 
@@ -345,54 +453,71 @@ elif ss.step == 2:
 # ================= 4. EXPORT =================
 elif ss.step == 3:
     rows, drawing, ext = ss.rows, ss.drawing, ss.extraction
+    out_rows = as9102.exported_rows(rows)
     cnt = {s: sum(r["status"] == s for r in rows) for s in ("Accepted", "Corrected", "Rejected")}
-    _, mid, _ = st.columns([1, 2, 1])
-    with mid:
-        with st.container(border=True):
-            st.markdown('<div class="cf-h">Your AS9102 package is ready</div>'
-                        f'<div class="cf-c">{cnt["Accepted"] + cnt["Corrected"]} characteristics · '
-                        f'{html.escape(ext.drawing.part_number or drawing.filename)}</div>', unsafe_allow_html=True)
-            st.write("")
-            for col, (k, v) in zip(st.columns(3), cnt.items()):
-                col.metric(k, v)
-            with st.expander("Report details (Form 1)"):
-                c1, c2 = st.columns(2)
-                d = ext.drawing
-                info = {"part_number": c1.text_input("Part number", d.part_number),
-                        "part_name": c2.text_input("Part name", d.part_name),
-                        "drawing_number": c1.text_input("Drawing number", d.drawing_number),
-                        "revision": c2.text_input("Revision", d.revision),
-                        "drawing_revision": d.revision,
-                        "serial_number": c1.text_input("Serial number"),
-                        "fai_report_number": c2.text_input("FAI report number"),
-                        "prepared_by": c1.text_input("Prepared by"),
-                        "date": date.today().strftime("%d-%b-%Y"),
-                        "material": d.material, "material_spec": d.material_spec}
-                tpl = st.file_uploader("Different AS9102 template (optional)", type=["xlsx"])
-            clean = overlay.draw(drawing.image, rows, clean=True)
-            clean_png = png(clean)
-            xlsx = as9102.build_workbook(rows, drawing, info, clean_png, template=tpl.getvalue() if tpl else None,
-                                         model=extractor.MODEL)
-            ss.xlsx = xlsx
-            stem = Path(drawing.filename).stem
-            st.download_button("Download AS9102 Excel", xlsx, f"{stem}_AS9102.xlsx",
-                               "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                               type="primary", width="stretch")
-            st.download_button("Download ballooned drawing (PDF)", pdf(clean), f"{stem}_ballooned.pdf",
-                               "application/pdf", width="stretch")
-            trace = {"drawing": {"filename": drawing.filename, "sha256": drawing.sha256, "page": drawing.page + 1},
-                     "model": extractor.MODEL, "analysed_at": ss.get("analysed_at"),
-                     "exported_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                     "drawing_info": ext.drawing.model_dump(), "characteristics": rows}
-            d1, d2 = st.columns(2)
-            d1.download_button("Traceability JSON", json.dumps(trace, indent=2, default=str, ensure_ascii=False),
-                               f"{stem}_traceability.json", "application/json", type="tertiary", width="stretch")
-            d2.download_button("Ballooned drawing (PNG)", clean_png, f"{stem}_ballooned.png", "image/png",
-                               type="tertiary", width="stretch")
-        with st.expander("Preview ballooned drawing"):
-            st.image(clean, width="stretch")
+    total_s = time.time() - ss.get("t_start", time.time())
+    manual = manual_minutes(len(out_rows))
+    skipped = sum(1 for r in rows if r.get("_skipped"))
+    kpi3 = (f'<div class="cf-kpi"><div class="v">{skipped}</div><div class="l">accepted without individual review</div></div>'
+            if skipped else f'<div class="cf-kpi"><div class="v">{cnt["Corrected"] + cnt["Rejected"]}</div>'
+                            f'<div class="l">AI results corrected / rejected by engineer</div></div>')
+    st.markdown(f'<div class="cf-hero" style="margin-bottom:.4rem"><h1>AS9102 report ready</h1>'
+                f'<p>{html.escape(" · ".join(x for x in (ext.drawing.part_name or drawing.filename, ext.drawing.part_number) if x))}'
+                f'</p></div>', unsafe_allow_html=True)
+    st.markdown(f"""<div class="cf-kpis">
+      <div class="cf-kpi"><div class="v">{len(out_rows)}</div><div class="l">characteristics in the report</div></div>
+      <div class="cf-kpi"><div class="v">{sum(1 for r in rows if r['generated'])}</div><div class="l">balloons placed automatically</div></div>
+      {kpi3}
+      <div class="cf-kpi win"><div class="v">{fmt_dur(total_s)}</div><div class="l">total time · manual estimate ≈ {manual // 60}h {manual % 60:02d}m*</div></div>
+    </div>""", unsafe_allow_html=True)
+
+    left, right = st.columns([1.5, 1], gap="large")
+    with right, st.container(key="card_download"):
+        st.markdown('<div class="cf-title">Download</div>', unsafe_allow_html=True)
+        d = ext.drawing
+        with st.expander("Report details (Part Info sheet)"):
+            c1, c2 = st.columns(2)
+            info = {"part_number": c1.text_input("Part number", d.part_number),
+                    "part_name": c2.text_input("Part name", d.part_name),
+                    "drawing_number": c1.text_input("Drawing number", d.drawing_number),
+                    "revision": c2.text_input("Revision", d.revision),
+                    "drawing_revision": d.revision,
+                    "serial_number": c1.text_input("Serial / lot number"),
+                    "fai_report_number": c2.text_input("FAI report number"),
+                    "inspector": c1.text_input("Inspector name"),
+                    "customer": c2.text_input("Customer"),
+                    "material": d.material, "material_spec": d.material_spec}
+            tpl = st.file_uploader("Different template (optional)", type=["xlsx"])
+        clean = overlay.draw(drawing.image, rows, clean=True)
+        clean_png = png(clean)
+        xlsx = as9102.build_workbook(rows, drawing, info, clean_png, template=tpl.getvalue() if tpl else None,
+                                     model=extractor.MODEL)
+        ss.xlsx = xlsx
+        stem = Path(drawing.filename).stem
+        st.download_button("Download AS9102 Excel", xlsx, f"{stem}_AS9102.xlsx",
+                           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                           type="primary", width="stretch", icon=":material/table_view:")
+        st.download_button("Ballooned drawing · A3 PDF", overlay.a3_pdf(clean, " · ".join(
+                               x for x in (d.part_number, d.part_name, drawing.filename) if x)),
+                           f"{stem}_ballooned_A3.pdf", "application/pdf", width="stretch",
+                           icon=":material/picture_as_pdf:")
+        trace = {"drawing": {"filename": drawing.filename, "sha256": drawing.sha256, "page": drawing.page + 1},
+                 "model": extractor.MODEL, "analysed_at": ss.get("analysed_at"),
+                 "exported_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                 "drawing_info": ext.drawing.model_dump(), "characteristics": rows}
+        st.download_button("Traceability record (JSON)", json.dumps(trace, indent=2, default=str, ensure_ascii=False),
+                           f"{stem}_traceability.json", "application/json", type="tertiary", width="stretch")
+        st.caption("A3 landscape · team template · traceability sheet included")
         c1, c2 = st.columns(2)
         if c1.button("← Back to review", type="tertiary"):
             go(2)
         if c2.button("New drawing →", type="tertiary", width="stretch"):
             restart()
+    with left, st.container(key="card_preview"):
+        tab1, tab2 = st.tabs(["Characteristics sheet", "Ballooned drawing"])
+        with tab1:
+            st.dataframe(pd.DataFrame(as9102.preview(rows)), hide_index=True, width="stretch", height=430)
+        with tab2:
+            st.image(clean, width="stretch")
+    st.caption(f"*Manual estimate assumes ~{MANUAL_MIN_PER_CHAR} min per characteristic to balloon, interpret and "
+               f"transcribe, plus {MANUAL_SETUP_MIN} min setup.")

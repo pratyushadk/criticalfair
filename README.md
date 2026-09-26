@@ -13,10 +13,12 @@ The four samples in `samples/drawings/` have saved analyses (`samples/cache/`) -
 
 ## Demo script (≈2 min)
 1. **Upload** → pick `flange.jpeg` (no balloons) → *Analyse drawing*. Point out the live stages.
-2. **Review**: balloons generated right on each dimension; card shows feature name, exact notation, tool, zone.
+   The analysis screen shows the drawing being read live: text located → balloons found → characteristics identified.
+2. **Review**: balloons generated next to each dimension (never on top of text); card shows feature name, exact notation, tool, zone.
    *Accept all unflagged*, then resolve the amber ones (Accept / Edit / Reject).
-3. **Export** → *Download AS9102 Excel*: Form 1 from title block, Form 3 with zone ("Sht 1, B4"),
-   "Overall Length: 150.00 ±0.10 mm", tooling, plus Traceability + Ballooned Drawing sheets.
+3. **Export** → impact summary + preview of the Characteristics sheet → *Download AS9102 Excel*
+   (team "Final Template": Part Info with the ballooned drawing, Characteristics with PASS/FAIL formulas and
+   dropdown, Summary, plus a Traceability sheet) and the ballooned drawing PDF.
 4. Repeat with `cylinder_ballooned.png` to show existing-balloon detection, duplicate balloon numbers (5.1/5.2),
    missing numbers (3, 8, 9) and unballooned dimensions being caught.
 
