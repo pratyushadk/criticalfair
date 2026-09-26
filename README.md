@@ -25,4 +25,4 @@ The four samples in `samples/drawings/` have saved analyses (`samples/cache/`) -
 - `.venv/bin/python scripts/live_test.py <drawing>` – live Claude run with timings.
 - `.venv/bin/python scripts/render_test.py <drawing>` – full pipeline → overlays in `output/`.
 
-See `ARCHITECTURE.md`, `PRD.md`, `SRD.md`.
+Implementation docs: `docs/ARCHITECTURE.md`, `docs/PRD.md`, `docs/SRD.md`. Team specs: `ARCHITECTURE.md`, `PRD.md`, `SRS_PART1.md`, `SRS_PART2.md`.
